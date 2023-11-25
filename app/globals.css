@@ -2,26 +2,288 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+
+body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  background: hsl(0 0% 10%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+h1 {
+  color: #FFFFFF;
+  letter-spacing: -.02em;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+section {
+  display: grid;
+  gap: 4rem;
+  align-items: center;
+  justify-content: center;
+}
+
+section p {
+  margin: 0;
+  font-size: 2.25rem;
+  color: hsl(0 0% 40%);
+  text-align: center;
+  background: linear-gradient(hsl(0 0% 80%), hsl(0 0% 50%));
+  color: transparent;
+  background-clip: text;
+}
+
+.code {
+  font-size: 3rem;
+  display: flex;
+  flex-wrap: nowrap;
+  color: hsl(0 0% 100%);
+  justify-content: center;
+}
+
+.code:hover {
+  cursor: default;
+}
+
+.digit {
+  display: flex;
+  height: 100%;
+  padding: 5.5rem .7rem;
+}
+
+.digit:focus-visible {
+  outline-color: hsl(0 0% 50% / 0.25);
+  outline-offset: 1rem;
+}
+
+.digit span {
+  scale: calc(var(--active, 0) + 0.5);
+  filter: blur(calc((1 - var(--active, 0)) * 1rem));
+  transition: scale calc(((1 - var(--active, 0)) + 0.2) * 1s), filter calc(((1 - var(--active, 0)) + 0.2) * 2s);
+  font-weight: 400;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+}
+
+.digit:first-of-type {
+  padding-left: 5rem;
+}
+.digit:last-of-type {
+  padding-right: 5rem;
+}
+
+:root {
+  --lerp-0: 1;
+  --lerp-1: calc(sin(40deg));
+  --lerp-2: calc(sin(35deg));
+  --lerp-3: calc(sin(30deg));
+  --lerp-4: calc(sin(25deg));
+  --lerp-5: calc(sin(20deg));
+
+  --spread: 20;
+  --dot: 2;
+  --width: 500;
+  --height: 500;
+  --size: 256;
+  --speed: 20;
+  --brightness: 1.25;
+  --intersect: source-in, xor;
+  --intersect-moz: intersect;
+  --depth: 100px;
+  --bg: #FFFFFF;
+}
+
+.digit:is(:hover, :focus-visible) {
+  --active: var(--lerp-0);
+}
+.digit:is(:hover, :focus-visible) + .digit,
+.digit:has(+ .digit:is(:hover, :focus-visible)) {
+  --active: var(--lerp-1);
+}
+.digit:is(:hover, :focus-visible) + .digit + .digit,
+.digit:has(+ .digit + .digit:is(:hover, :focus-visible)) {
+  --active: var(--lerp-2);
+}
+.digit:is(:hover, :focus-visible) + .digit + .digit + .digit,
+.digit:has(+ .digit + .digit + .digit:is(:hover, :focus-visible)) {
+  --active: var(--lerp-3);
+}
+.digit:is(:hover, :focus-visible) + .digit + .digit + .digit + .digit,
+.digit:has(+ .digit + .digit + .digit + .digit:is(:hover, :focus-visible)) {
+  --active: var(--lerp-4);
+}
+.digit:is(:hover, :focus-visible) + .digit + .digit + .digit + .digit + .digit,
+.digit:has(+ .digit + .digit + .digit + .digit + .digit:is(:hover, :focus-visible)) {
+  --active: var(--lerp-5);
+}
+
+.scene {
+	background: #000;
+	border-radius: 12px;
+  transform-style: preserve-3d;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position:absolute;
+
+}
+
+.canvas::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+  background: var(--bg);
+  mask: radial-gradient(circle at 50% 50%, white calc(var(--dot) * 1px), transparent calc((var(--dot) * 1px) + 0.5px)) 50% 50% / calc(var(--spread) * 1px) calc(var(--spread) * 1px), url('https://assets.codepen.io/605876/noise-mask.png') calc(var(--size) * 1px) 50% / calc(var(--size) * 1px) calc(var(--size) * 1px);
+  -webkit-mask-composite: var(--intersect);
+  mask-composite: var(--intersect-moz);
+  animation: flicker calc(var(--speed) * 1s) infinite linear;
+  filter: brightness(var(--brightness));
+  border-radius: 12px;
+  transition: background 2s ease;
+}
+
+@keyframes flicker {
+  to {
+    mask-position: 50% 50%, 0 50%;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.no-mask .canvas {
+	mask: unset;
 }
+.dots-mask .canvas {
+	mask: radial-gradient(circle at 50% 50%, white calc(var(--dot) * 1px), transparent calc((var(--dot) * 1px) + 0.5px)) 50% 50% / calc(var(--spread) * 1px) calc(var(--spread) * 1px);
+}
+.noise-mask .canvas {
+	mask: url("https://assets.codepen.io/605876/noise-mask.png") calc(var(--size) * 1px) 50% / calc(var(--size) * 1px) calc(var(--size) * 1px);
+}
+
+.backdrop {
+	background: var(--bg);
+	position: absolute;
+	inset: 0;
+  transition: background 2s ease;
+}
+
+.noise::before {
+	content: "";
+	background: var(--bg);
+  transition: background 2s ease;
+	position: absolute;
+	inset: 0;
+	mask: url("https://assets.codepen.io/605876/noise-mask.png") calc(var(--size) * 1px) 50% / calc(var(--size) * 1px) calc(var(--size) * 1px);
+	animation: flicker calc(var(--speed) * 1s) infinite linear;
+}
+
+.dots, .noise, .backdrop {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+}
+
+.dots::before {
+	content: "";
+	background: var(--bg);
+  transition: background 2s ease;
+	position: absolute;
+	inset: 0;
+	mask: radial-gradient(circle at 50% 50%, white calc(var(--dot) * 1px), transparent calc((var(--dot) * 1px) + 0.5px)) 50% 50% / calc(var(--spread) * 1px) calc(var(--spread) * 1px);
+}
+
+.dots::after,
+.noise::after,
+.backdrop::after,
+.scene::after,
+.canvas::after {
+	content: "Dots Mask";
+	white-space: nowrap;
+	position: absolute;
+	left: calc(100% + 3rem);
+	top: 50%;
+	translate: 0 -50%;
+	font-size: 2rem;
+	color: hsl(0 0% 60%);
+	font-weight: 60;
+	background: linear-gradient(white, hsl(0 0% 0%));
+	background-clip: text;
+	-webkit-background-clip: text;
+	opacity: 0;
+}
+
+.noise::after {
+	content: "Noise Mask";
+}
+
+.backdrop::after {
+	content: "Background";
+}
+
+.scene::after {
+	content: "Backdrop";
+}
+.canvas::after {
+	content: "Composite Mask";
+}
+
+.dots {
+	transform: translate3d(0, 0, calc(var(--depth) * 3));
+}
+
+.noise {
+	transform: translate3d(0, 0, calc(var(--depth) * 2));
+}
+
+.backdrop {
+	transform: translate3d(0, 0, var(--depth));
+}
+
+.scene {
+	transition: transform 1s 2.5s, background 1s 2.5s;
+}
+
+.canvas {
+	transition: transform 1s 1.5s;
+}
+
+.scene::after,
+.canvas::after {
+	transition: opacity 0.5s 1s;
+}
+
+.backdrop,
+.backdrop::after {
+	transition: opacity 0.5s 0.5s;
+}
+
+.noise,
+.noise::after {
+	transition: opacity 0.5s 0.25s;
+}
+
+.dots,
+.dots::after {
+	transition: opacity 0.5s 0s;
+}
+
+
